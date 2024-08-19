@@ -1,0 +1,68 @@
+:root {
+    --primary-color: #8a2be2;
+    --primary-color-hover: #923ae4;
+    --secondary-color: #333;
+    --tertiary-color: #555;
+    --complementary-color: #83e22b;
+    --accent-color: #ffffff10;
+    --accent-color-hover: #ffffff20;
+    --background-color: #222;
+    --text-color: #fff;
+    --muted-text-color: #bbb;
+    --border-color: #ccc;
+    --scrollbar-color: #8a2be280;
+    --scrollbar-hover-color: #8a2be2bb;
+    --button-hover-brightness: 1.05;
+}
+
+* .hidden {
+    display: none !important;
+}
+
+.title {
+    padding: 5px 0px;
+    margin: 0;
+    font-size: 16px;
+    text-align: center;
+    background-color: var(--primary-color);
+    border-radius: 5px;
+}
+
+.standard-button {
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: filter 0.2s ease-in-out;
+}
+
+.standard-button .inactive {
+    cursor: not-allowed;
+}
+
+.standard-button:not(.inactive):hover {
+    filter: brightness(var(--button-hover-brightness));
+    transition: filter 0.2s ease-in-out;
+}
+
+.marquee {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.marquee:hover {
+    overflow: visible;
+    animation: marquee 5s linear infinite;
+}
+
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+
+div {
+    scroll-behavior: smooth;
+}

@@ -1,0 +1,68 @@
+#settings {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: calc(100vh - 60px);
+    margin-top: 40px;
+    padding: 30px 10px;
+    overflow: auto;
+}
+
+#settings .title {
+    width: 80%;
+    max-width: 600px;
+}
+
+.settings-container {
+    width: 80%;
+    max-width: 500px;
+    background-color: var(--secondary-color);
+    padding: 20px;
+    margin-top: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.setting-item label {
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.setting-item input,
+.setting-item select {
+    padding: 5px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.setting-item input[type="range"] {
+    width: 60%;
+}
+
+#selectFolderButton {
+    padding: 5px 10px;
+    background-color: var(--primary-color);
+    color: var(--textcolor);
+    font-size: 14px;
+}
+
+#selectedFolderPath {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+#saveSettings {
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    font-size: 16px;
+}

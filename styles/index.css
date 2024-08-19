@@ -1,0 +1,105 @@
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+div::-webkit-scrollbar {
+    width: 7px;
+}
+
+div::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-color);
+    transition: background-color 0.2s;
+}
+
+div::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-hover-color);
+}
+
+div::-webkit-scrollbar-track {
+    background-color: none;
+}
+
+#contextMenu {
+    position: absolute;
+    background-color: var(--text-color);
+    border: 1px solid var(--border-color);
+    color: var(--background-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#contextMenu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#contextMenu li {
+    padding: 5px 10px;
+    cursor: pointer;
+    position: relative;
+}
+
+#contextMenu li:hover {
+    background-color: #eee;
+}
+
+#playlistsSubMenu {
+    width: 150px;
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background-color: var(--text-color);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    padding: 0;
+    border-radius: 5px;
+}
+
+#playlistsSubMenu li {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#contextMenu li:hover #playlistsSubMenu,
+#playlistsSubMenu:hover {
+    display: block;
+}
+
+#popup-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
+    padding: 10px 20px;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#popup-container.show {
+    opacity: 1;
+}
+
+.popup {
+    width: 300px;
+    color: var(--text-color);
+    font-size: 16px;
+    text-align: center;
+}

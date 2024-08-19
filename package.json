@@ -1,0 +1,15 @@
+{
+    "name": "nachos-player",
+    "version": "1.5.2",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron . --clear-cache"
+    },
+    "dependencies": {
+        "jsmediatags": "^3.9.7",
+        "music-metadata": "^10.0.0"
+    },
+    "devDependencies": {
+        "electron": "^31.2.1"
+    }
+}
