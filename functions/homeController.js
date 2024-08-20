@@ -449,20 +449,6 @@ const filterSongs = debounce(function() {
             }, 300);
         }
     });
-    // const songsItemContainer = document.querySelectorAll('#songList div');
-
-    // songsItemContainer.forEach(item => {
-    //     const songTitle = item.querySelector('.song-name').textContent.toLowerCase();
-    //     if (songTitle.includes(filter)) {
-    //         item.classList.remove('fade-out');
-    //         item.style.display = '';
-    //     } else {
-    //         item.classList.add('fade-out');
-    //         setTimeout(() => {
-    //             item.style.display = 'none';
-    //         }, 300); // Corresponding to the CSS animation duration
-    //     }
-    // });
 }, 300);
 
 // Update the progress bar as the audio player plays.
