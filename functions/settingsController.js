@@ -1,14 +1,12 @@
 document.addEventListener('DOMContentLoaded', loadSettings);
 
 document.getElementById('saveSettings').addEventListener('click', saveSettings);~
-document.getElementById('selectFolderButton').addEventListener('click', () => {
-    ipcRenderer.send('select-music-folder');
-});
+document.getElementById('selectFolderButton').addEventListener('click', async () => {
+    const folderPath = await ipcRenderer.invoke('select-music-folder');
 
-ipcRenderer.on('music-folder-selected', (event, folderPath) => {
     document.getElementById('selectedFolderPath').textContent = folderPath || 'Nenhuma pasta selecionada';
     if (folderPath !== '') {
-        ipcRenderer.send('get-music-list', folderPath);
+        loadMusicList(folderPath);
     }
 });
 
@@ -20,11 +18,17 @@ function saveSettings() {
         selectedFolderPath: document.getElementById('selectedFolderPath').textContent
     }
 
-    // Save settings on local storage
-    localStorage.setItem('theme', elementValues.theme);
-    localStorage.setItem('volume', elementValues.volume);
-    localStorage.setItem('autoUpdate', elementValues.autoUpdate);
-    localStorage.setItem('selectedFolderPath', elementValues.selectedFolderPath);
+    // Try to save settings on local storage
+    try {
+        localStorage.setItem('theme', elementValues.theme);
+        localStorage.setItem('volume', elementValues.volume);
+        localStorage.setItem('autoUpdate', elementValues.autoUpdate);
+        localStorage.setItem('selectedFolderPath', elementValues.selectedFolderPath);
+        showPopup('Configurações salvas com sucesso!');
+    } catch (e) {
+        console.error('Error saving settings:', e);
+        showPopup('Um erro ocorreu, e as configurações não puderam ser salvas!');
+    }
 
     applySettings();
 }
@@ -65,8 +69,7 @@ function loadSettings() {
     document.getElementById('selectedFolderPath').textContent = storageSettings.selectedFolderPath;
 
     if (storageSettings.selectedFolderPath !== '') {
-        // Request the list of music files from the main process.
-        ipcRenderer.send('get-music-list', storageSettings.selectedFolderPath);
+        loadMusicList(storageSettings.selectedFolderPath);
     }
 
     applySettings();
