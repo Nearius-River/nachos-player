@@ -84,55 +84,22 @@ function updateQueueList() {
         clearQueueButton.classList.add('hidden');
     }
 
-    const existingListItems = queueListElement.children;
-    const newListItems = musicQueue.map((song, index) => {
-        const existingListItem = existingListItems[index];
-        if (existingListItem) {
-            existingListItem.querySelector('.song-name').textContent = `${song.title}`;
-            return existingListItem;
+    queueListElement.innerHTML = '';
+
+    musicQueue.forEach((song, index) => {
+        let songItem;
+        if (index !== 0) {
+            // Only add remove from queue functionality
+            // if song index is greater than 0
+            songItem = createSongItem(song, index, {
+                onClick: (song, index) => removeFromQueue(index),
+                iconClass: 'fa-minus',
+            });
         } else {
-            const songContainer = document.createElement('div');
-            const songNameContainer = document.createElement('div');
-            songNameContainer.classList.add('song-name-container');
-
-            const songNameDisplay = document.createElement('p');
-            songNameDisplay.classList.add('song-name');
-            songNameDisplay.textContent = `${song.title}`;
-            
-            const removeButton = document.createElement('span');
-            removeButton.textContent = index + 1;
-
-            // Only include remove functionality if it's not first song in the queue
-            if (index != 0) {
-                removeButton.addEventListener('click', () => removeFromQueueIndex(index));
-                removeButton.addEventListener('pointerenter', () => {
-                    removeButton.textContent = '';
-                    removeButton.classList.add('fa');
-                    removeButton.classList.add('fa-minus');
-                });
-                removeButton.addEventListener('pointerout', () => {
-                    removeButton.textContent = index + 1;
-                    removeButton.classList.remove('fa');
-                    removeButton.classList.remove('fa-minus');
-                });
-            }
-            
-            songNameContainer.appendChild(songNameDisplay);
-            songContainer.appendChild(removeButton);
-            songContainer.appendChild(songNameContainer);
-
-            return songContainer;
+            songItem = createSongItem(song, index);
         }
-    });
-
-    // Only remove/add items that have changed
-    const itemsToRemove = Array.from(existingListItems).filter((item, index) => index >= newListItems.length);
-    itemsToRemove.forEach((item) => queueListElement.removeChild(item));
-    newListItems.forEach((item, index) => {
-        if (index >= existingListItems.length) {
-            queueListElement.appendChild(item);
-        }
-    });
+        queueListElement.appendChild(songItem);
+    })
 }
 
 function addToQueue(song) {
@@ -172,7 +139,7 @@ function playQueueSong() {
     const song = musicQueue[0];
     audioPlayer.src = song.filePath;
     audioPlayer.volume = volumeSlider.value;
-    currentSongElement.textContent = `${song.title}`;
+    currentSongElement.textContent = song.title;
     setupMarquee(currentSongElement);
     artistElement.textContent = song.artist
     songCoverElement.src = !song.albumCover ? "images/album_cover-default.png" : song.albumCover;
@@ -182,23 +149,21 @@ function playQueueSong() {
 }
 
 /**
- * Removes the current song from the queue and updates the queue list.
+ * Removes a song from the queue at the specified index and updates the queue list.
+ * If no index is provided, it removes the first song in the queue.
+ * 
+ * @param {number} index - The index of the song to remove from the queue.
  */
-function removeFromQueue() {
-    if (musicQueue.length > 0) {
-        musicQueue.shift();
-    }
-    updateQueueList();
-}
-
-/**
- * Removes a song from the queue with the given index.
- */
-function removeFromQueueIndex(index) {
-    if (musicQueue.length > 0) {
+function removeFromQueue(index = 0) {
+    if (musicQueue.length > 0 && index < musicQueue.length) {
         musicQueue.splice(index, 1);
+        
+        if (index === 0 && musicQueue.length > 0) {
+            playNextInQueue();
+        }
+
+        updateQueueList();
     }
-    updateQueueList();
 }
 
 /**
@@ -237,8 +202,14 @@ function loadSongs(files) {
                 songs.push(songData);
                 if (songs.length === files.length) {
                     console.log('All files received!');
+                    songs.sort((a, b) => a.title.localeCompare(b.title));
+                    console.log(songs);
                     songs.forEach((song, index) => {
-                        const songItem = createSongItem(song, index);
+                        const songItem = createSongItem(song, index, {
+                            onClick: addToQueue,
+                            iconClass: 'fa-plus',
+                            onDoubleClick: addToQueue
+                        });
                         songItem.id = `song-item-${index}`;
                         songList.appendChild(songItem);
                     });
@@ -247,34 +218,64 @@ function loadSongs(files) {
         });
 }
 
-function createSongItem(song, index) {
-    const songNameContainer = document.createElement('div');
-    songNameContainer.classList.add('song-name-container');
-
-    const songNameDisplay = document.createElement('p');
-    songNameDisplay.classList.add('song-name');
-    songNameDisplay.textContent = song.title;
-    setupMarquee(songNameDisplay);
-
+function createSongItem(song, index, actionButtonConfig) {
     const songContainer = document.createElement('div');
-    const addButton = document.createElement('span');
-    addButton.textContent = index + 1;
+    songContainer.classList.add('song-container');
 
-    addButton.addEventListener('click', () => addToQueue(song));
-    addButton.addEventListener('pointerenter', () => {
-        addButton.textContent = '';
-        addButton.classList.add('fa');
-        addButton.classList.add('fa-plus');
-    });
-    addButton.addEventListener('pointerout', () => {
-        addButton.textContent = index + 1;
-        addButton.classList.remove('fa');
-        addButton.classList.remove('fa-plus');
-    });
+    // Album cover image
+    const albumCoverImg = document.createElement('img');
+    albumCoverImg.classList.add('album-cover');
+    albumCoverImg.src = !song.albumCover ? "images/album_cover-default.png" : song.albumCover;
+    albumCoverImg.alt = 'Album cover';
 
-    songNameContainer.appendChild(songNameDisplay);
-    songContainer.appendChild(addButton);
-    songContainer.appendChild(songNameContainer);
+    // Container for song title and artist name
+    const songInfoContainer = document.createElement('div');
+    songInfoContainer.classList.add('song-info-container');
+
+    // Song title
+    const songTitle = document.createElement('p');
+    songTitle.classList.add('song-title');
+    songTitle.textContent = song.title;
+    setupMarquee(songTitle);
+
+    // Artist name
+    const artistName = document.createElement('p');
+    artistName.classList.add('artist-name');
+    artistName.textContent = song.artist;
+
+    // Flexible action button
+    const actionButton = document.createElement('span');
+    actionButton.textContent = index + 1;
+
+    if (actionButtonConfig && typeof actionButtonConfig.onClick === 'function') {
+        actionButton.addEventListener('click', () => actionButtonConfig.onClick(song, index))
+    }
+
+    if (actionButtonConfig && actionButtonConfig.iconClass) {
+        actionButton.addEventListener('pointerenter', () => {
+            actionButton.textContent = '';
+            actionButton.classList.add('fa');
+            actionButton.classList.add(actionButtonConfig.iconClass);
+        });
+        actionButton.addEventListener('pointerout', () => {
+            actionButton.textContent = index + 1;
+            actionButton.classList.remove('fa');
+            actionButton.classList.remove(actionButtonConfig.iconClass);
+        });
+    }
+
+    if (actionButtonConfig && typeof actionButtonConfig.onDoubleClick === 'function') {
+        songContainer.addEventListener('dblclick', () => actionButtonConfig.onDoubleClick(song, index));
+    }
+
+    // Append song title and artist name to the info container
+    songInfoContainer.appendChild(songTitle);
+    songInfoContainer.appendChild(artistName);
+
+    // Append album cover and info container to the song container
+    songContainer.appendChild(actionButton);
+    songContainer.appendChild(albumCoverImg);
+    songContainer.appendChild(songInfoContainer);
 
     return songContainer;
 }
@@ -311,7 +312,6 @@ function togglePlayPause() {
 function playNextTrack() {
     if (musicQueue.length > 1) {
         removeFromQueue();
-        playNextInQueue();
     }
 }
 
@@ -326,20 +326,23 @@ function playPreviousTrack() {
     }
 }
 
+function resetExhibition() {
+    playButtonDisplay.classList.remove('fa-pause');
+    playButtonDisplay.classList.add('fa-play');
+    playButton.classList.add('inactive');
+    nextButton.classList.add('inactive');
+    previousButton.classList.add('inactive');
+    loopButton.classList.add('inactive');
+    // currentSongElement.textContent = 'Nenhuma música na fila!';
+    // artistElement.textContent = 'Informação do artista';
+    clearQueue();
+}
+
 function onTrackEnd() {
     if (musicQueue.length > 1) {
         removeFromQueue();
-        playNextInQueue();
     } else {
-        playButtonDisplay.classList.remove('fa-pause');
-        playButtonDisplay.classList.add('fa-play');
-        playButton.classList.add('inactive');
-        nextButton.classList.add('inactive');
-        previousButton.classList.add('inactive');
-        loopButton.classList.add('inactive');
-        currentSongElement.textContent = 'Nenhuma música na fila!';
-        artistElement.textContent = 'Informação do artista'
-        clearQueue();
+        resetExhibition();
     }
 }
 
@@ -407,7 +410,9 @@ function toggleLoop() {
     }
 }
 
-// Receive the list of music files from the main process.
+/** 
+ * Receive the list of music files from the main process. 
+ */
 async function loadMusicList(folderPath) {
     try {
         const data = await ipcRenderer.invoke('get-music-list', folderPath);
@@ -415,7 +420,6 @@ async function loadMusicList(folderPath) {
         _musicFolderPath = musicFolderPath;
 
         loadSongs(files);
-        setupEventListeners();
     } catch (error) {
         console.error("Error trying to load music list:", error);
     }
@@ -456,3 +460,5 @@ audioPlayer.addEventListener('timeupdate', () => updateProgressBar());
 
 // Search input handler.
 searchInput.addEventListener('input', filterSongs);
+
+document.addEventListener('DOMContentLoaded', setupEventListeners);
