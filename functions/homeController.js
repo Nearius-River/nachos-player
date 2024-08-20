@@ -406,8 +406,7 @@ function toggleLoop() {
     }
 }
 
-// Request the list of music files from the main process.
-ipcRenderer.send('get-music-list');
+// Receive the list of music files from the main process.
 ipcRenderer.on('music-list', (_, data) => {
     const { files, musicFolderPath } = data;
     _musicFolderPath = musicFolderPath;

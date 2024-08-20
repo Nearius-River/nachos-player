@@ -1,34 +1,18 @@
-/**
- * Main application file for the Electron music player.
- *
- * This script creates the main application window, sets up event listeners,
- * and handles communication between the renderer process and the main process.
- */
-
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
-let musicFolderPath = '';
-
-// Makes use of dynamic import to bypass ES requirement
+// Dynamically import the 'music-metadata' module
 let mm;
 (async () => {
     mm = await import('music-metadata');
 })();
 
-async function getDuration(filePath) {
-    try {
-        const metadata = await mm.parseFile(filePath);
-        return metadata.format.duration;
-    } catch (error) {
-        console.log(`Erro ao obter metadados do arquivo ${filePath}:`, error);
-        return 0;
-    }
-}
-
 let mainWindow;
 
+/**
+ * Create the main application window.
+ */
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 800,
@@ -36,59 +20,92 @@ function createWindow() {
         icon: path.join(__dirname, 'icons', 'icon-nobg.png'),
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false
+            contextIsolation: false,
         },
     });
 
     mainWindow.loadFile('index.html');
 
-    mainWindow.on('closed', function () {
+    mainWindow.on('closed', () => {
         mainWindow = null;
     });
 }
 
-app.on('ready', createWindow);
-
-async function selectMusicFolder(event) {
-    const result = await dialog.showOpenDialog({
-        properties: ['openDirectory']
-    });
-
-    if (!result.canceled && result.filePaths.length > 0) {
-        musicFolderPath = result.filePaths[0];
-        event.sender.send('music-folder-selected', musicFolderPath);
+/**
+ * Get the duration of a music file using the music-metadata module.
+ * @param {string} filePath - The path to the music file.
+ * @returns {Promise<number>} - The duration of the file in seconds.
+ */
+async function getDuration(filePath) {
+    try {
+        const metadata = await mm.parseFile(filePath);
+        return metadata.format.duration || 0;
+    } catch (error) {
+        console.error(`Failed to retrieve metadata for file: ${filePath}`, error);
+        return 0;
     }
 }
 
-ipcMain.on('select-music-folder', selectMusicFolder);
-
-ipcMain.on('get-music-list', event => {
-    if (musicFolderPath === '') {
-        selectMusicFolder();
-    }
-
-    fs.readdir(musicFolderPath, async (err, files) => {
-        if (!err) {
-            const mp3Files = files.filter(file => path.extname(file).toLowerCase() === '.mp3');
-            const fileDurations = [];
-    
-            for (const file of mp3Files) {
-                const filePath = path.join(musicFolderPath, file);
-                const duration = await getDuration(filePath);
-                fileDurations.push({ file, duration });
-            }
-            
-            event.sender.send('music-list', { files: fileDurations, musicFolderPath });
-        } else {
-            console.log(err);
-        }
+/**
+ * Select a music folder via the dialog module and send the selected path to the renderer.
+ */
+ipcMain.handle('select-music-folder', async () => {
+    const result = await dialog.showOpenDialog({
+        properties: ['openDirectory'],
     });
+
+    if (!result.canceled && result.filePaths.length > 0) {
+        return result.filePaths[0];
+    }
+    return null;
 });
 
-app.on('window-all-closed', function () {
+/**
+ * Retrieve the list of mp3 files and their durations from the selected music folder.
+ * @param {string} musicFolderPath - The path to the music folder.
+ * @returns {Promise<Array<{ file: string, duration: number }>>} - List of mp3 files and their durations.
+ */
+async function getMusicList(musicFolderPath) {
+    try {
+        const files = await fs.promises.readdir(musicFolderPath);
+        const mp3Files = files.filter(file => path.extname(file).toLowerCase() === '.mp3');
+
+        const fileDurations = await Promise.all(
+            mp3Files.map(async (file) => {
+                const filePath = path.join(musicFolderPath, file);
+                const duration = await getDuration(filePath);
+                return { file, duration };
+            })
+        );
+
+        return fileDurations;
+    } catch (error) {
+        console.error(`Failed to read music folder: ${musicFolderPath}`, error);
+        return [];
+    }
+}
+
+/**
+ * Handle the 'get-music-list' event from the renderer process.
+ */
+ipcMain.handle('get-music-list', async (event, musicFolderPath) => {
+    const musicList = await getMusicList(musicFolderPath);
+    return { files: musicList, musicFolderPath };
+});
+
+/**
+ * Event listener for when all windows are closed.
+ */
+app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });
 
-app.on('activate', function () {
+/**
+ * Event listener for when the application is reactivated (macOS).
+ */
+app.on('activate', () => {
     if (mainWindow === null) createWindow();
 });
+
+// Initialize the app
+app.on('ready', createWindow);
