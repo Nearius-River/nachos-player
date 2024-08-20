@@ -34,7 +34,7 @@
             <div class="search-bar">
                 <input type="text" id="searchInput" placeholder="Buscar música">
             </div>
-            <div class="sort-options">
+            <div class="sort-options" id="sort-options">
                 <button class="sort-button" data-sort-by="title">Título</button>
                 <button class="sort-button" data-sort-by="artist">Artista</button>
                 <button class="sort-button" data-sort-by="album">Álbum</button>
@@ -46,8 +46,8 @@
 
         <div class="player-container">
             <div id="music-info">
-                <div class="song-name-container">
-                    <h3 id="currentSong" class="song-name">Nenhuma música na fila!</h3>
+                <div class="current-song-container">
+                    <h3 id="currentSong" class="song-title">Nenhuma música na fila!</h3>
                 </div>
                 <img id="songCover" src="images/album_cover-default.png" alt="Capa do álbum" width="300" height="300">
                 <h4 id="artist">Informação do artista</h4>
