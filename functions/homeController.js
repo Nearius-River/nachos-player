@@ -229,8 +229,8 @@ function loadSongs(files) {
                     filePath: path.join(_musicFolderPath, file),
                     fileName: file,
                     title: metadata.title || file.replace('.mp3', ''),
-                    artist: metadata.artist || '<artista desconhecido>',
-                    album: metadata.album || '<álbum desconhecido>',
+                    artist: metadata.artist || 'artista desconhecido',
+                    album: metadata.album || 'álbum desconhecido',
                     albumCover: metadata? metadata.albumCover : null,
                     duration: duration
                 };
@@ -239,6 +239,7 @@ function loadSongs(files) {
                     console.log('All files received!');
                     songs.forEach((song, index) => {
                         const songItem = createSongItem(song, index);
+                        songItem.id = `song-item-${index}`;
                         songList.appendChild(songItem);
                     });
                 }
@@ -407,13 +408,18 @@ function toggleLoop() {
 }
 
 // Receive the list of music files from the main process.
-ipcRenderer.on('music-list', (_, data) => {
-    const { files, musicFolderPath } = data;
-    _musicFolderPath = musicFolderPath;
+async function loadMusicList(folderPath) {
+    try {
+        const data = await ipcRenderer.invoke('get-music-list', folderPath);
+        const { files, musicFolderPath } = data;
+        _musicFolderPath = musicFolderPath;
 
-    loadSongs(files);
-    setupEventListeners();
-});
+        loadSongs(files);
+        setupEventListeners();
+    } catch (error) {
+        console.error("Error trying to load music list:", error);
+    }
+}
 
 function debounce(func, wait) {
     let timeout;
@@ -425,20 +431,38 @@ function debounce(func, wait) {
 
 const filterSongs = debounce(function() {
     const filter = searchInput.value.toLowerCase();
-    const songsItemContainer = document.querySelectorAll('#songList div');
 
-    songsItemContainer.forEach(item => {
-        const songTitle = item.querySelector('.song-name').textContent.toLowerCase();
-        if (songTitle.includes(filter)) {
-            item.classList.remove('fade-out');
-            item.style.display = '';
+    songs.forEach((song, index) => {
+        const songItem = document.getElementById(`song-item-${index}`);
+        const matchesFilter =
+            song.title.toLowerCase().includes(filter) || 
+            song.artist.toLowerCase().includes(filter) || 
+            song.album.toLowerCase().includes(filter);
+        
+        if (matchesFilter) {
+            songItem.classList.remove('fade-out');
+            songItem.style.display = '';
         } else {
-            item.classList.add('fade-out');
+            songItem.classList.add('fade-out');
             setTimeout(() => {
-                item.style.display = 'none';
-            }, 300); // Corresponding to the CSS animation duration
+                songItem.style.display = 'none';
+            }, 300);
         }
     });
+    // const songsItemContainer = document.querySelectorAll('#songList div');
+
+    // songsItemContainer.forEach(item => {
+    //     const songTitle = item.querySelector('.song-name').textContent.toLowerCase();
+    //     if (songTitle.includes(filter)) {
+    //         item.classList.remove('fade-out');
+    //         item.style.display = '';
+    //     } else {
+    //         item.classList.add('fade-out');
+    //         setTimeout(() => {
+    //             item.style.display = 'none';
+    //         }, 300); // Corresponding to the CSS animation duration
+    //     }
+    // });
 }, 300);
 
 // Update the progress bar as the audio player plays.
