@@ -40,42 +40,51 @@ function displayPlaylists() {
         const listItem = document.createElement('li');
         listItem.classList.add('playlist-item');
 
+        // Playlist information (name, number of songs, duration)
         const playlistInfo = document.createElement('div');
+        playlistInfo.classList.add('playlist-info');
         playlistInfo.innerHTML = `<h3>${playlist.name}</h3><p>${playlist.songs.length} músicas, ${formatDuration(playlist.totalDuration)}</p>`;
         playlistInfo.addEventListener('click', () => toggleSongList(index));
 
+        // Play all button
         const playAllButton = document.createElement('button');
         playAllButton.textContent = 'Reproduzir todas';
-        playAllButton.classList.add('standard-button');
-        playAllButton.classList.add('play-all-button');
+        playAllButton.classList.add('standard-button', 'play-all-button');
         playAllButton.addEventListener('click', () => playAllSongs(index));
 
+        // Delete playlist button
         const deleteButton = document.createElement('span');
         deleteButton.textContent = 'Excluir';
         deleteButton.classList.add('delete-playlist');
         deleteButton.addEventListener('click', () => deletePlaylist(index));
 
+        // Song list (hidden by default)
         const songList = document.createElement('ul');
         songList.classList.add('song-list');
+        songList.style.display = 'none';
 
         playlist.songs.forEach((song, songIndex) => {
             const songItem = document.createElement('li');
             songItem.classList.add('song-item');
-            songItem.innerHTML = `<span>${song.title} - ${song.artist}</span>
-                                  <div class="controls">
-                                      <button class="standard-button play-button" onclick="playSong('${song.title}', ${index})">Reproduzir</button>
-                                      <button class="standard-button remove-button" onclick="removeSongFromPlaylist(${index}, ${songIndex})">Remover</button>
-                                  </div>`;
+            songItem.innerHTML = `
+                <span>${song.title} - ${song.artist}</span>
+                <div class="controls">
+                    <button class="standard-button play-button" onclick="playSong('${song.title}', ${index})">Reproduzir</button>
+                    <button class="standard-button remove-button" onclick="removeSongFromPlaylist(${index}, ${songIndex})">Remover</button>
+                </div>`;
             songList.appendChild(songItem);
         });
 
+        // Append elements to the playlist item
         listItem.appendChild(playlistInfo);
         listItem.appendChild(playAllButton);
         listItem.appendChild(songList);
         listItem.appendChild(deleteButton);
+
         playlistList.appendChild(listItem);
     });
 }
+
 
 function toggleSongList(index) {
     const playlistListItems = document.querySelectorAll('#playlistList .playlist-item');
@@ -88,7 +97,7 @@ function playSong(songTitle, playlistIndex) {
     const song = playlist.songs.find(s => s.title === songTitle);
     if (song) {
         addToQueue(song);
-        showPopup(`Adicionando "${song.title}" à fila de reprodução.`);
+        showPopup(`Adicionado "${song.title}" à fila de reprodução.`);
     }
 }
 
@@ -97,7 +106,7 @@ function playAllSongs(playlistIndex) {
     playlist.songs.forEach(song => {
         addToQueue(song);
     });
-    showPopup(`Adicionando todas as músicas da playlist "${playlist.name}" à fila de reprodução.`);
+    showPopup(`Adicionado todas as músicas da playlist "${playlist.name}" à fila de reprodução.`);
 }
 
 function removeSongFromPlaylist(playlistIndex, songIndex) {
@@ -125,8 +134,8 @@ function formatDuration(duration) {
     return `${hours > 0 ? hours + 'h ' : ''}${minutes > 0 ? minutes + 'm ' : ''}${Math.floor(seconds)}s`;
 }
 
-document.addEventListener('contextmenu', (event) => {
-    if (event.target.classList.contains('song-name')) {
+document.addEventListener('contextmenu', (event) => {;
+    if (event.target.classList.contains('song-container')) {
         event.preventDefault();
         const contextMenu = document.getElementById('contextMenu');
         const playlistsSubMenu = document.getElementById('playlistsSubMenu');
