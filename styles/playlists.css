@@ -48,19 +48,29 @@
 #playlistList .delete-playlist {
     color: red;
     cursor: pointer;
+    margin-top: 15px;
 }
 
 .playlist-item {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
     padding: 10px;
     border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+.playlist-info {
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .playlist-item h3 {
     margin: 0;
     font-size: 18px;
-    cursor: pointer;
 }
 
 .playlist-item p {
@@ -72,16 +82,16 @@
 .song-list {
     list-style: none;
     padding: 0;
-    margin: 10px 0 0 0;
+    margin: 10px 0 0;
     display: none;
+    width: 100%;
 }
 
 .song-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 5px 10px;
-    margin-right: 5px;
+    padding: 10px 0;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -101,5 +111,7 @@
     background-color: var(--primary-color);
     color: #fff;
     padding: 5px 10px;
-    margin-bottom: 10px;
+    margin-top: 10px;
+    align-self: flex-start;
+    z-index: 1;
 }

@@ -8,21 +8,75 @@
     padding: 30px 10px;
 }
 
-.song-name-container {
-    flex: 1;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+.song-container {
     padding: 0;
 }
 
-.song-name {
+.song-info-container {
+    flex: 1;
+    overflow: hidden;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.song-title {
     width: 100%;
     margin: 0;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    display: inline-block;
+}
+
+.artist-name {
+    width: 100%;
+    margin: 0;
+    font-size: 14px;
+    color: gray;
+}
+
+.album-cover {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+#songList, #queueList {
+    margin-top: 20px;
+    padding: 0px 10px;
+}
+
+#songList div, #queueList div {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    padding: 5px 0px;
+    margin-bottom: 5px;
+    transition: background-color 0.3s ease;
+}
+
+#songList > div, #queueList > div {
+    background: var(--accent-color);
+}
+
+#songList > div:hover, #queueList > div:hover {
+    background-color: var(--accent-color-hover);
+}
+
+#songList span, #queueList span {
+    width: 20px;
+    height: 20px;
+    color: var(--text-color);
+    font-weight: bolder;
+    font-size: 16px;
+    background: none;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+    margin-right: 20px;
 }
 
 #home progress {

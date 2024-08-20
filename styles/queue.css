@@ -33,42 +33,6 @@
     background-color: var(--accent-color-hover);
 }
 
-#queueList {
-    margin-top: 20px;
-    padding: 0px 10px;
-}
-
-#queueList div {
-    height: 30px;
-    display: flex;
-    align-items: center;
-    border-radius: 5px;
-    padding: 5px 0px;
-    margin-bottom: 5px;
-    transition: background-color 0.3s ease;
-}
-
-#queueList > div {
-    background: var(--accent-color);
-}
-
-#queueList > div:hover {
-    background-color: var(--accent-color-hover);
-}
-
-#queueList span {
-    width: 20px;
-    height: 20px;
-    color: var(--text-color);
-    font-weight: bolder;
-    font-size: 16px;
-    background: none;
-    border: none;
-    border-radius: 5px;
-    margin-left: 10px;
-    margin-right: 20px;
-}
-
 #queueList div .fa-minus {
     cursor: pointer;
 }

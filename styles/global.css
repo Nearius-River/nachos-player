@@ -54,7 +54,7 @@
 }
 
 .marquee:hover {
-    overflow: visible;
+    overflow: visible !important;
     animation: marquee 5s linear infinite;
 }
 
