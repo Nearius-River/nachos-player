@@ -6,7 +6,7 @@ Nachos Player é um aplicativo de músicas simples e intuitivo, desenvolvido com
 
 - 🎵 **Reprodução de Músicas:** Suporte para múltiplos formatos de arquivos de música, como MP3.
 - 📂 **Criação de Playlists:** Crie playlists personalizadas, organize suas músicas e visualize a duração total de cada playlist.
-- 🔍 **Busca de Músicas:** Encontre rapidamente músicas pelo nome.
+- 🔍 **Busca de Músicas:** Encontre rapidamente músicas pelo título, artista ou álbum.
 - ⏯️ **Fila de Reprodução:** Adicione músicas à fila e personalize a ordem de reprodução.
 - 🎨 **Interface Personalizável:** Interface moderna e visual agradável, incluindo menus contextuais e popups de aviso.
 - 🎧 **Gerenciamento de Playlists:** Adicione ou remova músicas das playlists, reproduza playlists inteiras e exclua playlists quando necessário.
