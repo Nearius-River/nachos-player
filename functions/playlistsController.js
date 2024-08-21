@@ -11,6 +11,7 @@ document.getElementById('createPlaylistButton').addEventListener('click', () => 
         playlists.push(newPlaylist);
         savePlaylists();
         displayPlaylists();
+        showPopup('Nova playlist salva!');
         document.getElementById('playlistNameInput').value = '';
     }
 });
@@ -29,7 +30,12 @@ function addSongToPlaylist(songName, playlistIndex) {
 }
 
 function savePlaylists() {
-    localStorage.setItem('playlists', JSON.stringify(playlists));
+    try {
+        localStorage.setItem('playlists', JSON.stringify(playlists));
+    } catch (e) {
+        console.error('Error trying to save a playlist:', e);
+        showPopup('Um erro ocorreu tentando salvar a playlist.')
+    }
 }
 
 function displayPlaylists() {
@@ -67,10 +73,14 @@ function displayPlaylists() {
             const songItem = document.createElement('li');
             songItem.classList.add('song-item');
             songItem.innerHTML = `
-                <span>${song.title} - ${song.artist}</span>
+                <img src=${!song.albumCover ? "images/album_cover-default.png" : song.albumCover} width="40" height="40">
+                <div class="playlist-song-info">
+                    <p class="playlist-song-title">${song.title}</p>
+                    <p class="playlist-song-artist">${song.artist}</p>
+                </div>
                 <div class="controls">
                     <button class="standard-button play-button" onclick="playSong('${song.title}', ${index})">Reproduzir</button>
-                    <button class="standard-button remove-button" onclick="removeSongFromPlaylist(${index}, ${songIndex})">Remover</button>
+                    <button class="standard-button remove-button" onclick="removeSongFromPlaylist(${index}, ${songIndex}, ${song.duration})">Remover</button>
                 </div>`;
             songList.appendChild(songItem);
         });
@@ -109,9 +119,10 @@ function playAllSongs(playlistIndex) {
     showPopup(`Adicionado todas as músicas da playlist "${playlist.name}" à fila de reprodução.`);
 }
 
-function removeSongFromPlaylist(playlistIndex, songIndex) {
+function removeSongFromPlaylist(playlistIndex, songIndex, songDuration) {
     const playlist = playlists[playlistIndex];
     playlist.songs.splice(songIndex, 1);
+    playlist.totalDuration -= songDuration;
     showPopup('Música removida da playlist.');
     savePlaylists();
     displayPlaylists();
@@ -135,7 +146,7 @@ function formatDuration(duration) {
 }
 
 document.addEventListener('contextmenu', (event) => {;
-    if (event.target.classList.contains('song-container')) {
+    if (event.target.classList.contains('song-container') || event.target.classList.contains('song-title') || event.target.classList.contains('artist-name') || event.target.classList.contains('album-cover')) {
         event.preventDefault();
         const contextMenu = document.getElementById('contextMenu');
         const playlistsSubMenu = document.getElementById('playlistsSubMenu');
