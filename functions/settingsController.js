@@ -5,7 +5,7 @@ document.getElementById('selectFolderButton').addEventListener('click', async ()
     const folderPath = await ipcRenderer.invoke('select-music-folder');
 
     document.getElementById('selectedFolderPath').textContent = folderPath || 'Nenhuma pasta selecionada';
-    if (folderPath !== '') {
+    if (folderPath !== '' && folderPath !== localStorage.getItem('selectedFolderPath')) {
         loadMusicList(folderPath);
     }
 });
@@ -67,6 +67,7 @@ function loadSettings() {
     document.getElementById('defaultVolume').value = storageSettings.volume;
     document.getElementById('autoUpdate').checked = storageSettings.autoUpdate;
     document.getElementById('selectedFolderPath').textContent = storageSettings.selectedFolderPath;
+    ipcRenderer.invoke('update-music-folder', storageSettings.selectedFolderPath);
 
     if (storageSettings.selectedFolderPath !== '') {
         loadMusicList(storageSettings.selectedFolderPath);
