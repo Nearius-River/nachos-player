@@ -3,6 +3,8 @@
 
 <head>
     <title>Nachos Player</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/global.css">
     <link rel="stylesheet" href="styles/index.css">
     <link rel="stylesheet" href="styles/home.css">
@@ -34,11 +36,6 @@
             <div class="search-bar">
                 <input type="text" id="searchInput" placeholder="Buscar música">
             </div>
-            <div class="sort-options" id="sort-options">
-                <button class="sort-button" data-sort-by="title">Título</button>
-                <button class="sort-button" data-sort-by="artist">Artista</button>
-                <button class="sort-button" data-sort-by="album">Álbum</button>
-            </div>
             <div id="songList">
                 <!-- Song items will be dynamically generated here -->
             </div>
@@ -51,6 +48,7 @@
                 </div>
                 <img id="songCover" src="images/album_cover-default.png" alt="Capa do álbum" width="300" height="300">
                 <h4 id="artist">Informação do artista</h4>
+                <h5 id="album">Informação do álbum</h5>
             </div>
 
             <div class="controls">
@@ -76,7 +74,7 @@
         <div class="queue-container">
             <h3 class="title">Fila de músicas</h3>
             <div class="queue-controls">
-                <button id="clearQueueButton" class="hidden"><i class="fa fa-trash"></i></button>
+                <button id="clearQueueButton" class="inactive"><i class="fa fa-trash"></i>Limpar fila</button>
             </div>
             <div id="queueList">
                 <!-- Queue list items will be dynamically generated here -->
@@ -95,17 +93,20 @@
                 </select>
             </div>
             <div class="setting-item">
-                <label for="selectDefaultFolder">Pasta de músicas</label>
-                <button id="selectFolderButton" class="standard-button">Escolher Pasta</button>
+                <label for="selectFolderButton">Pasta de músicas</label>
+                <button id="selectFolderButton" class="standard-button"><i class="fa fa-folder"></i>Escolher Pasta</button>
                 <p id="selectedFolderPath">Nenhuma pasta selecionada</p>
             </div>
             <div class="setting-item">
                 <label for="defaultVolume">Volume Padrão</label>
-                <input type="range" id="defaultVolume" class="volumeSlider" min="0" max="0.5" step="0.005" value="0.25"/>
+                <input type="range" id="defaultVolume" class="volumeSlider" min="0" max="0.5" step="0.0025" value="0.25"/>
             </div>
             <div class="setting-item">
                 <label for="autoUpdate">Atualização Automática (demonstração apenas)</label>
-                <input type="checkbox" id="autoUpdate">
+                <label class="switch">
+                    <input type="checkbox" id="autoUpdate">
+                    <span class="slider"></span>
+                </label>
             </div>
             <button id="saveSettings" class="standard-button">Salvar Configurações</button>
         </div>
@@ -115,7 +116,7 @@
         <h2 class="title">Playlists</h2>
         <div class="playlist-controls">
             <input type="text" id="playlistNameInput" placeholder="Nome da Playlist">
-            <button id="createPlaylistButton" class="standard-button">Criar Playlist</button>
+            <button id="createPlaylistButton" class="standard-button"><i class="fa fa-plus"></i>Criar Playlist</button>
         </div>
         <ul id="playlistList">
             <!-- Playlist items will be dynamically generated here -->

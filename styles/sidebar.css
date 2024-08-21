@@ -27,28 +27,6 @@
     box-sizing: border-box;
 }
 
-.sort-options {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 10px;
-}
-
-.sort-button {
-    background-color: #444;
-    color: #fff;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    margin-top: 15px;
-    transition: background-color 0.3s ease;
-}
-
-.sort-button:hover {
-    background-color: var(--tertiary-color);
-}
-
 @keyframes fadeOut {
     from {
         opacity: 1;
