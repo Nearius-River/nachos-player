@@ -7,20 +7,20 @@ body {
     overflow: hidden;
 }
 
-div::-webkit-scrollbar {
+::-webkit-scrollbar {
     width: 7px;
 }
 
-div::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-color);
     transition: background-color 0.2s;
 }
 
-div::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
     background-color: var(--scrollbar-hover-color);
 }
 
-div::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
     background-color: none;
 }
 
