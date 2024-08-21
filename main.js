@@ -49,15 +49,24 @@ async function getDuration(filePath) {
 /**
  * Select a music folder via the dialog module and send the selected path to the renderer.
  */
+let lastResult = null
 ipcMain.handle('select-music-folder', async () => {
+    
     const result = await dialog.showOpenDialog({
         properties: ['openDirectory'],
     });
 
     if (!result.canceled && result.filePaths.length > 0) {
-        return result.filePaths[0];
+        if (result.filePaths[0] !== lastResult) lastResult = result.filePaths[0];
+        return lastResult
     }
-    return null;
+    return lastResult;
+});
+
+// Handles the event only once to update the folder path on the main renderer.
+ipcMain.handleOnce('update-music-folder', async (event, folderPath) => {
+    lastResult = folderPath;
+    return true;
 });
 
 /**
