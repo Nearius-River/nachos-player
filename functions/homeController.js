@@ -17,6 +17,7 @@ const progressBar = document.getElementById('progressBar');
 const currentTimeElement = document.getElementById('currentTime');
 const totalTimeElement = document.getElementById('totalTime');
 const artistElement = document.getElementById('artist');
+const albumElement = document.getElementById('album');
 const songCoverElement = document.getElementById('songCover');
 const searchInput = document.getElementById('searchInput');
 const volumeSlider = document.getElementById('volumeSlider');
@@ -79,9 +80,9 @@ function setupMarquee(element) {
  */
 function updateQueueList() {
     if (musicQueue.length > 1) {
-        clearQueueButton.classList.remove('hidden');
+        clearQueueButton.classList.remove('inactive');
     } else {
-        clearQueueButton.classList.add('hidden');
+        clearQueueButton.classList.add('inactive');
     }
 
     queueListElement.innerHTML = '';
@@ -142,6 +143,7 @@ function playQueueSong() {
     currentSongElement.textContent = song.title;
     setupMarquee(currentSongElement);
     artistElement.textContent = song.artist
+    albumElement.textContent = song.album
     songCoverElement.src = !song.albumCover ? "images/album_cover-default.png" : song.albumCover;
     audioPlayer.play();
     playButtonDisplay.classList.remove('fa-play');
@@ -203,7 +205,6 @@ function loadSongs(files) {
                 if (songs.length === files.length) {
                     console.log('All files received!');
                     songs.sort((a, b) => a.title.localeCompare(b.title));
-                    console.log(songs);
                     songs.forEach((song, index) => {
                         const songItem = createSongItem(song, index, {
                             onClick: addToQueue,
@@ -213,6 +214,7 @@ function loadSongs(files) {
                         songItem.id = `song-item-${index}`;
                         songList.appendChild(songItem);
                     });
+                    showPopup('Suas músicas foram carregadas com sucesso.');
                 }
             });
         });
@@ -422,6 +424,7 @@ async function loadMusicList(folderPath) {
         loadSongs(files);
     } catch (error) {
         console.error("Error trying to load music list:", error);
+        showPopup('Um erro ocorreu ao tentar carregar as músicas.');
     }
 }
 
