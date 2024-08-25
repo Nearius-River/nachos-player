@@ -138,6 +138,24 @@
     background-color: var(--primary-color-hover);
 }
 
+.volume-container {
+    display: flex;
+}
+
+#volumeButton.inactive {
+    color: #6e6e6e;
+}
+
+#volumeButton {
+    color: var(--text-color);
+    padding: 0;
+    margin-right: 2px;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    border-radius: 50%;
+}
+
 .progress-container {
     display: flex;
     align-items: center;

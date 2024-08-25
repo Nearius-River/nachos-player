@@ -17,14 +17,14 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
-        icon: path.join(__dirname, 'icons', 'icon-nobg.png'),
+        icon: path.join(__dirname, 'src', 'assets', 'icons', 'icon-nobg.png'),
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
         },
     });
 
-    mainWindow.loadFile('index.html');
+    mainWindow.loadFile('src/views/index.html');
 
     mainWindow.on('closed', () => {
         mainWindow = null;

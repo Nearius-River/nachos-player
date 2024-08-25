@@ -5,15 +5,16 @@
     <title>Nachos Player</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles/global.css">
-    <link rel="stylesheet" href="styles/index.css">
-    <link rel="stylesheet" href="styles/home.css">
-    <link rel="stylesheet" href="styles/settings.css">
-    <link rel="stylesheet" href="styles/playlists.css">
-    <link rel="stylesheet" href="styles/player.css">
-    <link rel="stylesheet" href="styles/queue.css">
-    <link rel="stylesheet" href="styles/sidebar.css">
-    <link rel="stylesheet" href="styles/navbar.css">
+    <link rel="stylesheet" href="../assets/styles/global.css">
+    <link rel="stylesheet" href="../assets/styles/index.css">
+    <link rel="stylesheet" href="../assets/styles/home.css">
+    <link rel="stylesheet" href="../assets/styles/profile.css">
+    <link rel="stylesheet" href="../assets/styles/playlists.css">
+    <link rel="stylesheet" href="../assets/styles/settings.css">
+    <link rel="stylesheet" href="../assets/styles/player.css">
+    <link rel="stylesheet" href="../assets/styles/queue.css">
+    <link rel="stylesheet" href="../assets/styles/sidebar.css">
+    <link rel="stylesheet" href="../assets/styles/navbar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 
@@ -23,10 +24,10 @@
             <h1>Nachos Player!</h1>
         </div>
         <div class="nav-links">
-            <a href="#" id="homeLink">Home</a>
-            <a href="#" id="searchLink">Buscar</a>
-            <a href="#" id="playlistsLink">Playlists</a>
-            <a href="#" id="settingsLink">Configurações</a>
+            <a id="homeLink" class="active-page">Home</a>
+            <a id="profileLink">Perfil</a>
+            <a id="playlistsLink">Playlists</a>
+            <a id="settingsLink">Configurações</a>
         </div>
     </div>
 
@@ -46,7 +47,7 @@
                 <div class="current-song-container">
                     <h3 id="currentSong" class="song-title">Nenhuma música na fila!</h3>
                 </div>
-                <img id="songCover" src="images/album_cover-default.png" alt="Capa do álbum" width="300" height="300">
+                <img id="songCover" src="../assets/images/album_cover-default.png" alt="Capa do álbum" width="300" height="300">
                 <h4 id="artist">Informação do artista</h4>
                 <h5 id="album">Informação do álbum</h5>
             </div>
@@ -57,7 +58,10 @@
                     <button class="control-button inactive" id="playButton"><i class="fa fa-play"></i></button>
                     <button class="control-button inactive" id="nextButton"><i class="fa fa-forward"></i></button>
                     <button class="control-button inactive" id="loopButton"><i class="fa fa-repeat"></i></button>
-                    <input type="range" id="volumeSlider" class="volumeSlider" min="0" max="0.5" step="0.005" value="0.25"/>
+                    <div class="volume-container">
+                        <button class="inactive" id="volumeButton"><i class="fa fa-volume-low"></i></button>
+                        <input type="range" id="volumeSlider" class="volumeSlider" min="0" max="0.5" step="0.005" value="0.25"/>
+                    </div>
                 </div>
                 <div class="progress-container">
                     <span id="currentTime">00:00</span>
@@ -79,6 +83,18 @@
             <div id="queueList">
                 <!-- Queue list items will be dynamically generated here -->
             </div>
+        </div>
+    </div>
+
+    <div id="profile" class="hidden">
+        <h2 class="title">Perfil</h2>
+        <div class="stats-container">
+            <p>Músicas Reproduzidas: <span id="totalPlayCount"></span></p>
+            <p>Tempo Total de Reprodução: <span id="totalPlayTime"></span></p>
+            <p>Música Mais Tocada: <span id="mostPlayedSong"></span></p>
+            <p>Última Música Reproduzida: <span id="lastPlayedSong"></span></p>
+            <p>Músicas Recentes:</p>
+            <ul id="recentSongs"></ul>
         </div>
     </div>
 
@@ -137,11 +153,15 @@
         </div>
     </div>
     
-    <script src="functions/popupController.js"></script>
-    <script src="functions/navigationController.js"></script>
-    <script src="functions/homeController.js"></script>
-    <script src="functions/settingsController.js"></script>
-    <script src="functions/playlistsController.js"></script>
+    <script src="../utils/utils.js"></script>
+    <script src="../services/metrics.js"></script>
+    <script src="../controllers/popupController.js"></script>
+    <script src="../controllers/navigationController.js"></script>
+    <script src="../controllers/homeController.js"></script>
+    <script src="../controllers/profileController.js"></script>
+    <script src="../controllers/settingsController.js"></script>
+    <script src="../controllers/playlistsController.js"></script>
+    <script src="../controllers/shortcutController.js"></script>
 </body>
 
 </html>

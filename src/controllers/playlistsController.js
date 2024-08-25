@@ -73,7 +73,7 @@ function displayPlaylists() {
             const songItem = document.createElement('li');
             songItem.classList.add('song-item');
             songItem.innerHTML = `
-                <img src=${!song.albumCover ? "images/album_cover-default.png" : song.albumCover} width="40" height="40">
+                <img src=${!song.albumCover ? "../assets/images/album_cover-default.png" : song.albumCover} width="40" height="40">
                 <div class="playlist-song-info">
                     <p class="playlist-song-title">${song.title}</p>
                     <p class="playlist-song-artist">${song.artist}</p>
@@ -136,13 +136,6 @@ function deletePlaylist(index) {
         displayPlaylists();
         showPopup('Playlist excluída com sucesso!');
     }
-}
-
-function formatDuration(duration) {
-    const hours = Math.floor(duration / 3600);
-    const minutes = Math.floor((duration % 3600) / 60);
-    const seconds = duration % 60;
-    return `${hours > 0 ? hours + 'h ' : ''}${minutes > 0 ? minutes + 'm ' : ''}${Math.floor(seconds)}s`;
 }
 
 document.addEventListener('contextmenu', (event) => {;

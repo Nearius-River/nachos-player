@@ -1,0 +1,90 @@
+#profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: calc(100vh - 60px);
+    margin-top: 40px;
+    padding: 30px 10px;
+    overflow: auto;
+}
+
+#profile .title {
+    width: 80%;
+    max-width: 600px;
+}
+
+#profile .stats-container {
+    width: 90%;
+    max-width: 600px;
+    background-color: var(--secondary-color);
+    padding: 30px;
+    margin-top: 20px;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#profile .stats-container p {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+#profile .stats-container p:last-child {
+    border-bottom: none;
+}
+
+#profile .stats-container ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+#profile .stats-container ul li {
+    background-color: var(--accent-color);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: background-color 0.3s ease;
+}
+
+#profile .stats-container ul li:hover {
+    background-color: var(--accent-color-hover);
+}
+
+#profile .stats-container ul li::before {
+    content: "🎵";
+    font-size: 1.5rem;
+}
+
+#profile .stats-container span {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+    #profile .stats-container {
+        width: 95%;
+        padding: 20px;
+    }
+    
+    #profile .title {
+        font-size: 1.8rem;
+    }
+    
+    #profile .stats-container p {
+        font-size: 1.1rem;
+    }
+}

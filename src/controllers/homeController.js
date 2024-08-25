@@ -1,8 +1,7 @@
-// functions/player.js
-
 const { ipcRenderer } = require('electron');
 const path = require('path');
-const jsmediatags = require('jsmediatags');
+const Song = require('../models/Song.js');
+const QueueSong = require('../models/QueueSong.js');
 
 // DOM elements
 const queueListElement = document.getElementById('queueList');
@@ -21,59 +20,19 @@ const albumElement = document.getElementById('album');
 const songCoverElement = document.getElementById('songCover');
 const searchInput = document.getElementById('searchInput');
 const volumeSlider = document.getElementById('volumeSlider');
+const volumeButton = document.getElementById('volumeButton');
+const volumeButtonDisplay = volumeButton.querySelector('i');
 const loopButton = document.getElementById('loopButton');
 
 // State
 let songs = [];
 const musicQueue = [];
 let loopState = 0 // 0 = loop off; 1 = looping entire track; 2 = looping single
+let previousVolumeState;
+let currentStartTime = null;
+let pausedStartTime = null;
+let totalPausedTime = 0;
 let _musicFolderPath;
-
-/**
- * Reads the ID3 tags from a given MP3 file.
- * @param {string} file - The file path.
- * @param {function} callback - Callback function to handle the metadata.
- */
-function readID3Tags(file, callback) {
-    jsmediatags.read(file, {
-        onSuccess: function (tag) {
-            const { title, artist, album, picture } = tag.tags;
-            
-            // Convert the picture data to an image file
-            let albumCover = undefined;
-
-            try {
-                const { data, format } = picture;
-                let base64String = "";
-                for (let i = 0; i < data.length; i++) {
-                    base64String += String.fromCharCode(data[i]);
-                }
-                albumCover = `data:${data.format};base64,${window.btoa(base64String)}`;
-            } catch (e) {
-                console.warn('Could not convert the picture data for file', file);
-            }
-
-            // Send the data
-            callback({ title, artist, album, albumCover });
-        },
-        onError: function (error) {
-            console.error('Erro ao ler metadados:', error);
-            callback(null);
-        },
-    });
-}
-
-/**
- * Sets up marquee effect for text overflow.
- * @param {HTMLElement} element - The element to apply the marquee effect to.
- */
-function setupMarquee(element) {
-    if (element.scrollWidth > element.clientWidth) {
-        element.classList.add('marquee');
-    } else {
-        element.classList.remove('marquee');
-    }
-}
 
 /**
  * Updates the queue list in the UI to reflect the current music queue.
@@ -104,23 +63,18 @@ function updateQueueList() {
 }
 
 function addToQueue(song) {
-    const queueSong = {
-        filePath: song.filePath,
-        file: song.fileName,
-        title: song.title,
-        artist: song.artist,
-        album: song.album,
-        albumCover: song.albumCover
-    }
-
+    const queueSong = new QueueSong(song);
     musicQueue.push(queueSong);
+
     if (musicQueue.length === 1) {
         playButton.classList.remove('inactive');
         nextButton.classList.remove('inactive');
         previousButton.classList.remove('inactive');
         loopButton.classList.remove('inactive');
+        volumeButton.classList.remove('inactive');
         playNextInQueue();
     }
+
     updateQueueList()
 }
 
@@ -138,13 +92,14 @@ function playNextInQueue() {
  */
 function playQueueSong() {
     const song = musicQueue[0];
+    currentStartTime = new Date().getTime();
     audioPlayer.src = song.filePath;
     audioPlayer.volume = volumeSlider.value;
     currentSongElement.textContent = song.title;
     setupMarquee(currentSongElement);
     artistElement.textContent = song.artist
     albumElement.textContent = song.album
-    songCoverElement.src = !song.albumCover ? "images/album_cover-default.png" : song.albumCover;
+    songCoverElement.src = !song.albumCover ? "../assets/images/album_cover-default.png" : song.albumCover;
     audioPlayer.play();
     playButtonDisplay.classList.remove('fa-play');
     playButtonDisplay.classList.add('fa-pause');
@@ -192,16 +147,8 @@ function loadSongs(files) {
     files
         .forEach(({ file, duration }) => {
             readID3Tags(path.join(_musicFolderPath, file), (metadata) => {
-                const songData = {
-                    filePath: path.join(_musicFolderPath, file),
-                    fileName: file,
-                    title: metadata.title || file.replace('.mp3', ''),
-                    artist: metadata.artist || 'artista desconhecido',
-                    album: metadata.album || 'álbum desconhecido',
-                    albumCover: metadata? metadata.albumCover : null,
-                    duration: duration
-                };
-                songs.push(songData);
+                const song = new Song(_musicFolderPath, file, metadata, duration)
+                songs.push(song);
                 if (songs.length === files.length) {
                     console.log('All files received!');
                     songs.sort((a, b) => a.title.localeCompare(b.title));
@@ -227,7 +174,7 @@ function createSongItem(song, index, actionButtonConfig) {
     // Album cover image
     const albumCoverImg = document.createElement('img');
     albumCoverImg.classList.add('album-cover');
-    albumCoverImg.src = !song.albumCover ? "images/album_cover-default.png" : song.albumCover;
+    albumCoverImg.src = !song.albumCover ? "../assets/images/album_cover-default.png" : song.albumCover;
     albumCoverImg.alt = 'Album cover';
 
     // Container for song title and artist name
@@ -283,6 +230,13 @@ function createSongItem(song, index, actionButtonConfig) {
 }
 
 /**
+ * Find the song with the given id in the songs array
+ */
+function findSongById(songId) {
+    return songs.find(song => song.id === songId);
+}
+
+/**
  * Sets up event listeners for the player controls and audio player.
  */
 function setupEventListeners() {
@@ -294,6 +248,7 @@ function setupEventListeners() {
     audioPlayer.addEventListener('ended', onTrackEnd);
     audioPlayer.addEventListener('timeupdate', updateProgressBar);
     volumeSlider.addEventListener('input', changeVolume);
+    volumeButton.addEventListener('click', toggleMute);
     loopButton.addEventListener('click', toggleLoop);
 }
 
@@ -303,16 +258,24 @@ function togglePlayPause() {
             audioPlayer.play();
             playButtonDisplay.classList.remove('fa-play');
             playButtonDisplay.classList.add('fa-pause');
+
+            if (pausedStartTime) {
+                const currentTime = new Date().getTime();
+                totalPausedTime += currentTime - pausedStartTime;
+                pausedStartTime = null;
+            }
         } else {
             audioPlayer.pause();
             playButtonDisplay.classList.remove('fa-pause');
             playButtonDisplay.classList.add('fa-play');
+            pausedStartTime = new Date().getTime();
         }
     }
 }
 
 function playNextTrack() {
     if (musicQueue.length > 1) {
+        updateStats();
         removeFromQueue();
     }
 }
@@ -335,12 +298,12 @@ function resetExhibition() {
     nextButton.classList.add('inactive');
     previousButton.classList.add('inactive');
     loopButton.classList.add('inactive');
-    // currentSongElement.textContent = 'Nenhuma música na fila!';
-    // artistElement.textContent = 'Informação do artista';
+    volumeButton.classList.add('inactive')
     clearQueue();
 }
 
 function onTrackEnd() {
+    updateStats();
     if (musicQueue.length > 1) {
         removeFromQueue();
     } else {
@@ -391,7 +354,37 @@ function clearButtonClicked() {
 
 function changeVolume() {
     let volume = parseFloat(volumeSlider.value);
+    let maxVolume = parseFloat(volumeSlider.max);
+
     audioPlayer.volume = volume;
+
+    if (audioPlayer.muted) {
+        toggleMute();
+    }
+
+    if (volume === 0) {
+        // Volume is 0%
+        volumeButtonDisplay.setAttribute('class', 'fa fa-volume-xmark');
+    } else if (volume <= (maxVolume * 0.65)) {
+        // Volume is below 65% of the maximum
+        volumeButtonDisplay.setAttribute('class', 'fa fa-volume-low');
+    } else {
+        volumeButtonDisplay.setAttribute('class', 'fa fa-volume-high');
+    }
+
+    previousVolumeState = volumeButtonDisplay.getAttribute('class');
+}
+
+function toggleMute() {
+    if (musicQueue.length > 0) {
+        audioPlayer.muted = !audioPlayer.muted;
+        if (audioPlayer.muted) {
+            previousVolumeState = volumeButtonDisplay.getAttribute('class');
+            volumeButtonDisplay.setAttribute('class', 'fa fa-volume-xmark');
+        } else {
+            volumeButtonDisplay.setAttribute('class', previousVolumeState);
+        }
+    }
 }
 
 function toggleLoop() {
@@ -412,6 +405,18 @@ function toggleLoop() {
     }
 }
 
+function updateStats() {
+    if (currentStartTime) {
+        const currentSong = musicQueue[0];
+        const currentTime = new Date().getTime();
+        const timeListened = currentTime - currentStartTime - totalPausedTime; // Result will be given in miliseconds
+        trackPlayback(currentSong, timeListened);
+        updateMusicStats(currentSong.id, timeListened);
+        currentStartTime = null;
+        totalPausedTime = 0;
+    }
+}
+
 /** 
  * Receive the list of music files from the main process. 
  */
@@ -426,14 +431,6 @@ async function loadMusicList(folderPath) {
         console.error("Error trying to load music list:", error);
         showPopup('Um erro ocorreu ao tentar carregar as músicas.');
     }
-}
-
-function debounce(func, wait) {
-    let timeout;
-    return function(...args) {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), wait);
-    };
 }
 
 const filterSongs = debounce(function() {
@@ -464,4 +461,5 @@ audioPlayer.addEventListener('timeupdate', () => updateProgressBar());
 // Search input handler.
 searchInput.addEventListener('input', filterSongs);
 
+// Sets event listeners upon loading DOM.
 document.addEventListener('DOMContentLoaded', setupEventListeners);
