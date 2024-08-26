@@ -37,9 +37,11 @@ function handleKeyboardShortcuts(event) {
             break;
         case 'F2':
             navigateTo('profile');
+            displayStats()
             break;
         case 'F3':
             navigateTo('playlists');
+            displayPlaylists()
             break;
         case 'F4':
             navigateTo('settings');

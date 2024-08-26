@@ -19,6 +19,12 @@ function navigateTo(pageId) {
 }
 
 document.getElementById('homeLink').addEventListener('click', () => navigateTo('home'));
-document.getElementById('profileLink').addEventListener('click', () => navigateTo('profile'));
+document.getElementById('profileLink').addEventListener('click', () => {
+    navigateTo('profile')
+    displayStats();
+});
+document.getElementById('playlistsLink').addEventListener('click', () => {
+    navigateTo('playlists');
+    displayPlaylists();
+});
 document.getElementById('settingsLink').addEventListener('click', () => navigateTo('settings'));
-document.getElementById('playlistsLink').addEventListener('click', () => navigateTo('playlists'));
