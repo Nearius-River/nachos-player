@@ -1,5 +1,5 @@
-let totalPlayCount = localStorage.getItem('totalPlayCount') || 0;
-let totalPlayTime = localStorage.getItem('totalPlayTime') || 0;
+let totalPlayCount = Number(localStorage.getItem('totalPlayCount')) || 0;
+let totalPlayTime = Number(localStorage.getItem('totalPlayTime')) || 0;
 let musicHistory = JSON.parse(localStorage.getItem('musicHistory')) || [];
 let musicStats = JSON.parse(localStorage.getItem('musicStats')) || {};
 
@@ -29,5 +29,14 @@ function updateMusicStats(songId, timeListened) {
 
 function clearMusicStats() {
     musicStats = {};
+    totalPlayCount = 0;
+    totalPlayTime = 0;
     localStorage.setItem('musicStats', JSON.stringify(musicStats));
+    localStorage.setItem('totalPlayCount', totalPlayCount);
+    localStorage.setItem('totalPlayTime', totalPlayTime);
+}
+
+function clearMusicHistory() {
+    musicHistory = [];
+    localStorage.setItem('musicHistory', JSON.stringify(musicHistory));
 }
