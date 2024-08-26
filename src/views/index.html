@@ -89,12 +89,16 @@
     <div id="profile" class="hidden">
         <h2 class="title">Perfil</h2>
         <div class="stats-container">
-            <p>Músicas Reproduzidas: <span id="totalPlayCount"></span></p>
+            <p>Reproduções Totais: <span id="totalPlayCount"></span></p>
             <p>Tempo Total de Reprodução: <span id="totalPlayTime"></span></p>
             <p>Música Mais Tocada: <span id="mostPlayedSong"></span></p>
             <p>Última Música Reproduzida: <span id="lastPlayedSong"></span></p>
             <p>Músicas Recentes:</p>
             <ul id="recentSongs"></ul>
+            <div class="profile-controls">
+                <button id="clearMusicHistory" class="standard-button">Limpar histórico</button>
+                <button id="clearMusicStats" class="standard-button">Limpar estatísticas</button>
+            </div>
         </div>
     </div>
 
@@ -152,6 +156,16 @@
             <span id="popup-message"></span>
         </div>
     </div>
+
+    <div id="confirmationModal" class="hidden">
+        <div class="modal-content">
+            <p id="confirmationText">Você tem certeza?</p>
+            <div class="modal-buttons">
+                <button id="confirmYes" class="standard-button confirm-button">Sim</button>
+                <button id="confirmNo" class="standard-button confirm-button">Não</button>
+            </div>
+        </div>
+    </div>    
     
     <script src="../utils/utils.js"></script>
     <script src="../services/metrics.js"></script>
@@ -162,6 +176,7 @@
     <script src="../controllers/settingsController.js"></script>
     <script src="../controllers/playlistsController.js"></script>
     <script src="../controllers/shortcutController.js"></script>
+    <script src="../controllers/confirmationController.js"></script>
 </body>
 
 </html>
