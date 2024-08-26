@@ -168,7 +168,3 @@ document.addEventListener('contextmenu', (event) => {;
 document.addEventListener('click', () => {
     document.getElementById('contextMenu').classList.add('hidden');
 });
-
-document.addEventListener('DOMContentLoaded', () => {
-    displayPlaylists();
-});
