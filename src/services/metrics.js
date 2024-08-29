@@ -8,7 +8,7 @@ function trackPlayback(song, duration = 0) {
     localStorage.setItem('totalPlayCount', totalPlayCount);
 
     totalPlayTime += duration;
-    localStorage.setItem('totalPlayTime', duration);
+    localStorage.setItem('totalPlayTime', totalPlayTime);
 
     musicHistory.unshift(song);
     if (musicHistory.length > 10) {
