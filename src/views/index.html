@@ -18,13 +18,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 
-<body>
+<body class="dark">
     <div class="navbar">
         <div class="navbar-title">
             <h1>Nachos Player!</h1>
         </div>
         <div class="nav-links">
-            <a id="homeLink" class="active-page">Home</a>
+            <a id="homeLink" class="active-page">Início</a>
             <a id="profileLink">Perfil</a>
             <a id="playlistsLink">Playlists</a>
             <a id="settingsLink">Configurações</a>
@@ -37,6 +37,7 @@
             <div class="search-bar">
                 <input type="text" id="searchInput" placeholder="Buscar música">
             </div>
+            <span id="loadedSongsPlayTime">Tempo total de reprodução:</span>
             <div id="songList">
                 <!-- Song items will be dynamically generated here -->
             </div>
@@ -80,6 +81,7 @@
             <div class="queue-controls">
                 <button id="clearQueueButton" class="inactive"><i class="fa fa-trash"></i>Limpar fila</button>
             </div>
+            <span id="queuedSongsPlayTime">Tempo total de reprodução:</span>
             <div id="queueList">
                 <!-- Queue list items will be dynamically generated here -->
             </div>
@@ -138,9 +140,9 @@
             <input type="text" id="playlistNameInput" placeholder="Nome da Playlist">
             <button id="createPlaylistButton" class="standard-button"><i class="fa fa-plus"></i>Criar Playlist</button>
         </div>
-        <ul id="playlistList">
+        <div id="playlistList">
             <!-- Playlist items will be dynamically generated here -->
-        </ul>
+        </div>
     </div>
 
     <div id="contextMenu" class="hidden">
@@ -165,7 +167,7 @@
                 <button id="confirmNo" class="standard-button confirm-button">Não</button>
             </div>
         </div>
-    </div>    
+    </div>
     
     <script src="../utils/utils.js"></script>
     <script src="../services/metrics.js"></script>

@@ -1,7 +1,6 @@
 const { ipcRenderer } = require('electron');
 const path = require('path');
 const Song = require('../models/Song.js');
-const QueueSong = require('../models/QueueSong.js');
 
 // DOM elements
 const queueListElement = document.getElementById('queueList');
@@ -18,6 +17,8 @@ const totalTimeElement = document.getElementById('totalTime');
 const artistElement = document.getElementById('artist');
 const albumElement = document.getElementById('album');
 const songCoverElement = document.getElementById('songCover');
+const loadedSongsPlayTimeElement = document.getElementById('loadedSongsPlayTime');
+const queuedSongsPlayTimeElement = document.getElementById('queuedSongsPlayTime');
 const searchInput = document.getElementById('searchInput');
 const volumeSlider = document.getElementById('volumeSlider');
 const volumeButton = document.getElementById('volumeButton');
@@ -27,6 +28,8 @@ const loopButton = document.getElementById('loopButton');
 // State
 let songs = [];
 const musicQueue = [];
+let combinedDuration = 0;
+let combinedQueueDuration = 0;
 let loopState = 0 // 0 = loop off; 1 = looping entire track; 2 = looping single
 let previousVolumeState;
 let currentStartTime = null;
@@ -44,6 +47,8 @@ function updateQueueList() {
         clearQueueButton.classList.add('inactive');
     }
 
+    queuedSongsPlayTimeElement.textContent = 'Tempo total de reprodução: ' + formatDuration(combinedQueueDuration);
+
     queueListElement.innerHTML = '';
 
     musicQueue.forEach((song, index) => {
@@ -52,19 +57,23 @@ function updateQueueList() {
             // Only add remove from queue functionality
             // if song index is greater than 0
             songItem = createSongItem(song, index, {
-                onClick: (song, index) => removeFromQueue(index),
+                onClick: (_, index) => removeFromQueue(index),
                 iconClass: 'fa-minus',
             });
         } else {
             songItem = createSongItem(song, index);
         }
+
         queueListElement.appendChild(songItem);
+
+        const songTitle = songItem.querySelector('.song-title');
+        setupMarquee(songTitle);
     })
 }
 
 function addToQueue(song) {
-    const queueSong = new QueueSong(song);
-    musicQueue.push(queueSong);
+    musicQueue.push(song);
+    combinedQueueDuration += song.duration;
 
     if (musicQueue.length === 1) {
         playButton.classList.remove('inactive');
@@ -99,7 +108,7 @@ function playQueueSong() {
     setupMarquee(currentSongElement);
     artistElement.textContent = song.artist
     albumElement.textContent = song.album
-    songCoverElement.src = !song.albumCover ? "../assets/images/album_cover-default.png" : song.albumCover;
+    songCoverElement.src = song.albumCover || "../assets/images/album_cover-default.png";
     audioPlayer.play();
     playButtonDisplay.classList.remove('fa-play');
     playButtonDisplay.classList.add('fa-pause');
@@ -113,6 +122,7 @@ function playQueueSong() {
  */
 function removeFromQueue(index = 0) {
     if (musicQueue.length > 0 && index < musicQueue.length) {
+        combinedQueueDuration -= musicQueue[index].duration;
         musicQueue.splice(index, 1);
         
         if (index === 0 && musicQueue.length > 0) {
@@ -128,12 +138,14 @@ function removeFromQueue(index = 0) {
  */
 function clearQueue() {
     musicQueue.length = 0;
+    combinedQueueDuration = 0;
     updateQueueList();
 }
 
 function clearLoadedSongs() {
     songList.innerHTML = '';
     songs = [];
+    combinedDuration = 0;
 }
 
 /**
@@ -144,14 +156,20 @@ function loadSongs(files) {
     clearQueue();
     clearLoadedSongs();
 
+    const fragment = document.createDocumentFragment();
+
     files
         .forEach(({ file, duration }) => {
             readID3Tags(path.join(_musicFolderPath, file), (metadata) => {
                 const song = new Song(_musicFolderPath, file, metadata, duration)
                 songs.push(song);
+                combinedDuration += song.duration
+
                 if (songs.length === files.length) {
                     console.log('All files received!');
                     songs.sort((a, b) => a.title.localeCompare(b.title));
+
+                    // Creates a new song item for each loaded song
                     songs.forEach((song, index) => {
                         const songItem = createSongItem(song, index, {
                             onClick: addToQueue,
@@ -159,8 +177,19 @@ function loadSongs(files) {
                             onDoubleClick: addToQueue
                         });
                         songItem.id = `song-item-${index}`;
-                        songList.appendChild(songItem);
+                        fragment.appendChild(songItem);
                     });
+
+                    songList.appendChild(fragment);
+
+                    // Sets up marquee effect after all elements are created
+                    const songItems = songList.querySelectorAll('.song-container');
+                    songItems.forEach(songItem => {
+                        const songTitle = songItem.querySelector('.song-title');
+                        setupMarquee(songTitle);
+                    });
+
+                    loadedSongsPlayTimeElement.textContent = 'Tempo total de reprodução: ' +  formatDuration(combinedDuration);
                     showPopup('Suas músicas foram carregadas com sucesso.');
                 }
             });
@@ -170,11 +199,12 @@ function loadSongs(files) {
 function createSongItem(song, index, actionButtonConfig) {
     const songContainer = document.createElement('div');
     songContainer.classList.add('song-container');
+    songContainer.setAttribute('song-id', String(song.id));
 
     // Album cover image
     const albumCoverImg = document.createElement('img');
     albumCoverImg.classList.add('album-cover');
-    albumCoverImg.src = !song.albumCover ? "../assets/images/album_cover-default.png" : song.albumCover;
+    albumCoverImg.src = song.albumCover || "../assets/images/album_cover-default.png";
     albumCoverImg.alt = 'Album cover';
 
     // Container for song title and artist name
@@ -185,7 +215,6 @@ function createSongItem(song, index, actionButtonConfig) {
     const songTitle = document.createElement('p');
     songTitle.classList.add('song-title');
     songTitle.textContent = song.title;
-    setupMarquee(songTitle);
 
     // Artist name
     const artistName = document.createElement('p');
@@ -348,6 +377,7 @@ function updateProgressBar() {
 function clearButtonClicked() {
     if (musicQueue.length > 1) {
         musicQueue.splice(1);
+        combinedQueueDuration = musicQueue[0].duration;
         updateQueueList();
     }
 }
