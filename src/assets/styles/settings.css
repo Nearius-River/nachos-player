@@ -10,13 +10,14 @@
 }
 
 #settings .title {
-    width: 80%;
+    width: 100%;
     max-width: 600px;
+    padding: 5px 20px;
 }
 
 .settings-container {
-    width: 80%;
-    max-width: 500px;
+    width: 100%;
+    max-width: 600px;
     background-color: var(--secondary-color);
     padding: 20px;
     margin-top: 10px;
@@ -56,28 +57,19 @@
 
 #selectFolderButton {
     padding: 10px 15px;
-    background-color: var(--primary-color);
-    color: var(--text-color);
     font-size: 14px;
-    border: none;
     border-radius: 8px;
-}
-
-#selectFolderButton i {
-    margin-right: 10px;
 }
 
 #selectedFolderPath {
     margin-top: 8px;
     font-size: 14px;
-    color: #666;
+    color: var(--muted-text-color);
     text-align: center;
 }
 
 #saveSettings {
     padding: 12px 20px;
-    background-color: var(--primary-color);
-    color: var(--text-color);
     font-size: 16px;
     width: 100%;
     margin-top: 20px;

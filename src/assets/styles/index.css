@@ -7,6 +7,40 @@ body {
     overflow: hidden;
 }
 
+body.dark {
+    --primary-color: #8a2be2;
+    --primary-color-hover: #923ae4;
+    --secondary-color: #333;
+    --tertiary-color: #555;
+    --complementary-color: #83e22b;
+    --accent-color: #ffffff10;
+    --accent-color-hover: #ffffff20;
+    --background-color: #222;
+    --text-color: #fff;
+    --muted-text-color: #bbb;
+    --border-color: #ccc;
+    --scrollbar-color: #8a2be280;
+    --scrollbar-hover-color: #8a2be2bb;
+    --popup-background-color: rgba(0, 0, 0, 0.5);
+}
+
+body.light {
+    --primary-color: #8a2be2;
+    --primary-color-hover: #7a25cc;
+    --secondary-color: #f0f0f0;
+    --tertiary-color: #dcdcdc;
+    --complementary-color: #83e22b;
+    --accent-color: #e0e0e0;
+    --accent-color-hover: #d3d3d3;
+    --background-color: #ffffff;
+    --text-color: #333;
+    --muted-text-color: #666;
+    --border-color: #ccc;
+    --scrollbar-color: #8a2be280;
+    --scrollbar-hover-color: #8a2be2bb;
+    --popup-background-color: rgba(255, 255, 255, 0.5);
+}
+
 ::-webkit-scrollbar {
     width: 7px;
 }
@@ -26,9 +60,9 @@ body {
 
 #contextMenu {
     position: absolute;
-    background-color: var(--text-color);
-    border: 1px solid var(--border-color);
-    color: var(--background-color);
+    background-color: var(--background-color);
+    border: none;
+    color: var(--text-color);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     padding: 10px;
@@ -48,7 +82,7 @@ body {
 }
 
 #contextMenu li:hover {
-    background-color: #eee;
+    filter: brightness(1.05);
 }
 
 #playlistsSubMenu {
@@ -57,8 +91,7 @@ body {
     position: absolute;
     left: 100%;
     top: 0;
-    background-color: var(--text-color);
-    border: 1px solid var(--border-color);
+    background-color: var(--background-color);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     z-index: 1001;
     padding: 0;
@@ -85,7 +118,7 @@ body {
     justify-content: center;
     align-items: center;
     width: auto;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0.5, 0.5, 0.5, 0.7);
     border-radius: 5px;
     padding: 10px 20px;
     z-index: 10000;
@@ -99,7 +132,7 @@ body {
 
 .popup {
     width: 300px;
-    color: var(--text-color);
+    color: #fff;
     font-size: 16px;
     text-align: center;
 }
@@ -134,6 +167,4 @@ body {
 
 .confirm-button {
     padding: 10px 20px;
-    background-color: var(--primary-color);
-    color: var(--text-color);
 }

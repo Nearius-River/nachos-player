@@ -85,7 +85,7 @@
 .volumeSlider {
     width: 100px;
     height: 10px;
-    background-color: #444;
+    background-color: var(--tertiary-color);
     border-radius: 10px;
     border: none;
     appearance: none;
@@ -163,7 +163,7 @@
 
 #currentTime, #totalTime {
     font-size: 12px;
-    color: var(--border-color);
+    color: var(--muted-text-color);
     margin: 0 5px;
 }
 

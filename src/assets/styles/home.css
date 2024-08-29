@@ -8,6 +8,10 @@
     padding: 30px 10px;
 }
 
+#home .title {
+    margin: 0px 10px;
+}
+
 .song-container {
     padding: 0;
 }
@@ -20,6 +24,7 @@
 }
 
 .song-title {
+    color: var(--text-color);
     width: 100%;
     margin: 0;
     overflow: hidden;
@@ -42,14 +47,22 @@
     margin-right: 10px;
 }
 
+#loadedSongsPlayTime, #queuedSongsPlayTime {
+    padding: 0px 10px;
+    width: 100%;
+    color: #888;
+    font-size: 14px;
+}
+
 #songList, #queueList {
     margin-top: 20px;
     padding: 0px 10px;
 }
 
-#songList div, #queueList div {
+.song-container {
     height: 40px;
     display: flex;
+    background-color: var(--accent-color);
     align-items: center;
     border-radius: 5px;
     padding: 5px 0px;
@@ -57,15 +70,11 @@
     transition: background-color 0.3s ease;
 }
 
-#songList > div, #queueList > div {
-    background: var(--accent-color);
-}
-
-#songList > div:hover, #queueList > div:hover {
+.song-container:hover {
     background-color: var(--accent-color-hover);
 }
 
-#songList span, #queueList span {
+.song-container span {
     width: 20px;
     height: 20px;
     color: var(--text-color);

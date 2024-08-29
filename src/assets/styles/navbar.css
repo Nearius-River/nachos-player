@@ -1,6 +1,6 @@
 .navbar {
     background-color: var(--primary-color);
-    color: var(--text-color);
+    color: #fff;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -34,7 +34,6 @@
 }
 
 .nav-links a {
-    color: var(--text-color);
     margin: 0 10px;
     text-decoration: none;
     font-size: 16px;
@@ -45,4 +44,5 @@
 .nav-links a:hover, .nav-links a.active-page {
     font-size: 20px;
     transition: font-size 0.2s ease-in-out;
+    text-decoration: underline;
 }
