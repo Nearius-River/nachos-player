@@ -1,13 +1,10 @@
 const playlists = JSON.parse(localStorage.getItem('playlists')) || [];
+const Playlist = require('../models/Playlist.js');
 
 document.getElementById('createPlaylistButton').addEventListener('click', () => {
     const playlistName = document.getElementById('playlistNameInput').value.trim();
     if (playlistName) {
-        const newPlaylist = {
-            name: playlistName,
-            songs: [],
-            totalDuration: 0
-        };
+        const newPlaylist = new Playlist(playlistName);
         playlists.push(newPlaylist);
         savePlaylists();
         displayPlaylists();
@@ -46,46 +43,65 @@ function displayPlaylists() {
         const listItem = document.createElement('li');
         listItem.classList.add('playlist-item');
 
-        // Playlist information (name, number of songs, duration)
         const playlistInfo = document.createElement('div');
         playlistInfo.classList.add('playlist-info');
-        playlistInfo.innerHTML = `<h3>${playlist.name}</h3><p>${playlist.songs.length} músicas, ${formatDuration(playlist.totalDuration)}</p>`;
         playlistInfo.addEventListener('click', () => toggleSongList(index));
 
-        // Play all button
+        const playlistDisplay = document.createElement('div');
+        playlistDisplay.classList.add('playlist-display');
+
+        const playlistName = document.createElement('h3');
+        playlistName.textContent = playlist.name;
+
+        playlistDisplay.appendChild(playlistName);
+
+        if (playlist.songs.length > 0) {
+            for (let i = 0; i < Math.min(playlist.songs.length, 4); i++) {
+                const playlistSongCover = document.createElement('img');
+                playlistSongCover.classList.add('album-cover')
+                playlistSongCover.src = playlist.songs[i].albumCover || "../assets/images/album_cover-default.png";
+                playlistDisplay.appendChild(playlistSongCover);
+            }
+        }
+
+        const playlistDuration = document.createElement('p');
+        playlistDuration.textContent = `${playlist.songs.length} músicas, ${formatDuration(playlist.totalDuration)}`
+
+        playlistInfo.appendChild(playlistDisplay);
+        playlistInfo.appendChild(playlistDuration);
+
         const playAllButton = document.createElement('button');
         playAllButton.textContent = 'Reproduzir todas';
         playAllButton.classList.add('standard-button', 'play-all-button');
         playAllButton.addEventListener('click', () => playAllSongs(index));
 
-        // Delete playlist button
-        const deleteButton = document.createElement('span');
+        const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Excluir';
+        deleteButton.classList.add('standard-button');
         deleteButton.classList.add('delete-playlist');
-        deleteButton.addEventListener('click', () => deletePlaylist(index));
+        deleteButton.addEventListener('click', () => {
+            showConfirmation(`Excluir a playlist '${playlist.name}?'`, (confirmed) => {
+                if (confirmed) {
+                    deletePlaylist(index);
+                } else {
+                    return;
+                }
+            })
+        });
 
-        // Song list (hidden by default)
-        const songList = document.createElement('ul');
+        const songList = document.createElement('div');
         songList.classList.add('song-list');
         songList.style.display = 'none';
 
         playlist.songs.forEach((song, songIndex) => {
-            const songItem = document.createElement('li');
-            songItem.classList.add('song-item');
-            songItem.innerHTML = `
-                <img src=${!song.albumCover ? "../assets/images/album_cover-default.png" : song.albumCover} width="40" height="40">
-                <div class="playlist-song-info">
-                    <p class="playlist-song-title">${song.title}</p>
-                    <p class="playlist-song-artist">${song.artist}</p>
-                </div>
-                <div class="controls">
-                    <button class="standard-button play-button" onclick="playSong('${song.title}', ${index})">Reproduzir</button>
-                    <button class="standard-button remove-button" onclick="removeSongFromPlaylist(${index}, ${songIndex}, ${song.duration})">Remover</button>
-                </div>`;
+            const songItem = createSongItem(song, songIndex, {
+                onClick: addToQueue,
+                iconClass: 'fa-plus',
+                onDoubleClick: addToQueue
+            });
             songList.appendChild(songItem);
         });
 
-        // Append elements to the playlist item
         listItem.appendChild(playlistInfo);
         listItem.appendChild(playAllButton);
         listItem.appendChild(songList);
@@ -94,7 +110,6 @@ function displayPlaylists() {
         playlistList.appendChild(listItem);
     });
 }
-
 
 function toggleSongList(index) {
     const playlistListItems = document.querySelectorAll('#playlistList .playlist-item');
@@ -129,13 +144,10 @@ function removeSongFromPlaylist(playlistIndex, songIndex, songDuration) {
 }
 
 function deletePlaylist(index) {
-    const confirmation = confirm(`Tem certeza de que deseja excluir a playlist "${playlists[index].name}"?`);
-    if (confirmation) {
-        playlists.splice(index, 1);
-        savePlaylists();
-        displayPlaylists();
-        showPopup('Playlist excluída com sucesso!');
-    }
+    playlists.splice(index, 1);
+    savePlaylists();
+    displayPlaylists();
+    showPopup('Playlist excluída com sucesso!');
 }
 
 document.addEventListener('contextmenu', (event) => {;
