@@ -31,7 +31,7 @@ class SettingsService {
     }
 
     applySettings(settings) {
-        document.body.className = settings.theme;
+        toggleTheme(settings.theme);
         const audioPlayer = document.getElementById('audioPlayer');
         if (audioPlayer) {
             audioPlayer.volume = settings.volume;

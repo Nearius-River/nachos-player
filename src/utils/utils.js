@@ -57,9 +57,7 @@ function readID3Tags(file, callback) {
                     base64String += String.fromCharCode(data[i]);
                 }
                 albumCover = `data:${data.format};base64,${window.btoa(base64String)}`;
-            } catch (e) {
-                console.warn('Could not convert the picture data for file', file);
-            }
+            } catch {}
 
             // Send the data
             callback({ title, artist, album, albumCover });
@@ -95,4 +93,11 @@ function setupMarquee(element) {
     } else {
         element.classList.remove('marquee');
     }
+}
+
+/**
+ * Toggles the application theme (e.g.: dark, light, etc).
+ */
+function toggleTheme(theme) {
+    document.body.className = theme;
 }
